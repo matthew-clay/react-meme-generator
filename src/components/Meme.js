@@ -11,6 +11,8 @@ export default function Meme() {
   // create allMemes state which we will fetch data with api url and set to allMemes state.
   const [allMemes, setAllMemes] = useState([]);
 
+  console.log(allMemes);
+
   const url = "https://api.imgflip.com/get_memes";
   useEffect(() => {
     fetch(url)
@@ -20,7 +22,7 @@ export default function Meme() {
   }, []); // <= *** remember dependencies array
 
   const getMemesImage = () => {
-    const randomNumber = Math.floor(Math.random * allMemes.length);
+    const randomNumber = Math.floor(Math.random() * allMemes.length);
     const memeImageSrc = allMemes[randomNumber].url;
     setMeme((prevMeme) => ({
       ...prevMeme,
@@ -29,7 +31,7 @@ export default function Meme() {
   };
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target; // destructure event object which is from browser
     setAllMemes((prevMeme) => ({
       ...prevMeme,
       [name]: value,
