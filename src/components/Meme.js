@@ -1,38 +1,36 @@
 import { useEffect, useState } from "react";
 
 export default function Meme() {
-  const url = "https://api.imgflip.com/get_memes";
-
+  // create state with top, bottom text and random image.
   const [meme, setMeme] = useState({
     topText: "",
     bottomText: "",
     randomMeme: "http://i.imgflip.com/1bij.jpg",
   });
 
+  // create allMemes state which we will fetch data with api url and set to allMemes state.
   const [allMemes, setAllMemes] = useState([]);
 
-  console.log(allMemes);
-
+  const url = "https://api.imgflip.com/get_memes";
   useEffect(() => {
     fetch(url)
       .then((res) => res.json())
-      .then((json) => setAllMemes(json.data.memes));
-  }, []); // remember *** dependencies array
+      .then((json) => setAllMemes(json.data.memes))
+      .catch((err) => console.log(err));
+  }, []); // <= *** remember dependencies array
 
   const getMemesImage = () => {
-    const randomNumber = Math.floor(Math.random() * allMemes.length);
-    const memeUrl = allMemes[randomNumber].url;
-
+    const randomNumber = Math.floor(Math.random * allMemes.length);
+    const memeImageSrc = allMemes[randomNumber].url;
     setMeme((prevMeme) => ({
       ...prevMeme,
-      randomMeme: memeUrl,
-    }));
+      randomMeme: memeImageSrc,
+    })); // <= () parenthesis here is used for implicit return
   };
 
   const handleChange = (event) => {
-    console.log(event.target); // <input class="form-inputs mr" type="text" name="topText" placeholder="Top Text" value="">
     const { name, value } = event.target;
-    setMeme((prevMeme) => ({
+    setAllMemes((prevMeme) => ({
       ...prevMeme,
       [name]: value,
     }));
