@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
+import { toJpeg } from "html-to-image"; // add html-to-image
 
 export default function Meme() {
   // create state with top, bottom text and random image.
   const [meme, setMeme] = useState({
     topText: "",
     bottomText: "",
-    randomMeme: "http://i.imgflip.com/1bij.jpg",
+  });
+
+  const [memeStats, setMemeStats] = useState({
+    randomMemeImage: "https://i.imgflip.com/1bgw.jpg",
+    memeName: "Futurama Fry",
   });
 
   // create allMemes state which we will fetch data with api url and set to allMemes state.
   const [allMemes, setAllMemes] = useState([]);
 
-  const url = "https://api.imgflip.com/get_memes";
-
   useEffect(() => {
+    const url = "https://api.imgflip.com/get_memes";
     const getMemesFromAPI = async () => {
       const response = await fetch(url);
       const json = await response.json();
@@ -24,10 +28,10 @@ export default function Meme() {
 
   const getMemesImage = () => {
     const randomNumber = Math.floor(Math.random() * allMemes.length);
-    const memeImageSrc = allMemes[randomNumber].url;
-    setMeme((prevMeme) => ({
-      ...prevMeme,
-      randomMeme: memeImageSrc,
+    setMemeStats((prevMemeStats) => ({
+      ...prevMemeStats,
+      randomMemeImage: allMemes[randomNumber].url,
+      memeName: allMemes[randomNumber].name,
     })); // <= () parenthesis here is used for implicit return
   };
 
@@ -37,6 +41,18 @@ export default function Meme() {
       ...prevMeme,
       [name]: value,
     }));
+  };
+
+  const downloadMeme = () => {
+    const memeNodeTag = document.getElementById("meme-node");
+
+    toJpeg(memeNodeTag).then(function (dataUrl) {
+      const link = document.createElement("a");
+      link.download = `${memeStats.memeName}.jpeg`;
+      link.href = dataUrl;
+      link.click();
+      link.remove();
+    });
   };
 
   return (
@@ -69,15 +85,19 @@ export default function Meme() {
         </button>
       </form>
       <div className="container">
-        <div className="memeContainer">
-          <img src={meme.randomMeme} alt="meme" className="result-meme" />
+        <div className="memeContainer" id="meme-node">
+          <img
+            src={memeStats.randomMemeImage}
+            alt="meme"
+            className="result-meme"
+          />
           <h2 className="meme-text top">{meme.topText}</h2>
           <h2 className="meme-text bottom">{meme.bottomText}</h2>
         </div>
 
-        <a href={meme.randomMeme} rel="noreferrer" target="_blank">
-          <button className="btn-download">Download 👇🏻</button>
-        </a>
+        <button className="btn-download" onClick={downloadMeme}>
+          Download 👇🏻
+        </button>
       </div>
     </main>
   );
